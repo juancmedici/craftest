@@ -1,0 +1,55 @@
+version: '3'
+
+services: 
+  sql_db:
+    image: postgres
+    environment: 
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports: 
+      - 5000:5000
+
+  no_sql_db:
+    image: mongo:4
+    command: mongod --logpath=/dev/null
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - 27017:27017
+  
+  back:
+    build: ./backend
+    volumes:
+      - ./backend:/code
+    environment: 
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=0.0.0.0
+      - DB_PORT=5000
+      - SECRET_KEY=juan
+    ports: 
+      - 8000:8000
+    depends_on: 
+      - sql_db
+      - no_sql_db
+  
+  front:
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend:/srv/app/devops-app
+    ports: 
+      - 3000:3000
+    depends_on:
+      - back
+  
+  nginx:
+    build: 
+      context: ./custom-nginx/
+      dockerfile: Dockerfile
+    ports:
+      - 8080:80
