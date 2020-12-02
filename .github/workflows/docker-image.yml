@@ -13,4 +13,4 @@ jobs:
     - name: Build the Docker image
       run: docker-compose up -d
     - name: Status Nginx
-      run: curl -I https://localhost:8080/
+      run: curl -I http://localhost:8080/
