@@ -1,6 +1,6 @@
 ## Arquitectura:
 
-### AWS
+### AWS: Descripción
 
 En el diagrama de red tenemos una Region en la cual voy a desplegar mi aplicación web, para llevar a cabo este procedimiento necesito agregar una VPC en donde van a vivir los componentes elegidos y clonados para que la aplicación escale según demanda.  
 Definimos una Internet Gateway para darle acceso a internet a la VPC y acceso a los clientes. La Internet Gateway va a estar conectada al Application Load Balancer porque voy a necesitar distribuir la carga entre mis diferentes aplicaciones.  
