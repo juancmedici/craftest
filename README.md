@@ -22,15 +22,11 @@ Para realizar la compilación y el despliegue manual de esta aplicación, necesi
 Descargar el archivo '.deb' (Ubuntu) del siguiente link:
 
 ~~~
-
 https://download.docker.com/linux/ubuntu/dists/
-
 ~~~
 
 Luego, instalar el paquete:
 
 ~~~~
-
 sudo dpkg -i /path/to/package.deb
-
 ~~~~
