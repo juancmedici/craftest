@@ -9,7 +9,7 @@ Creo un Kubernetes Cluster, el cual va a ser provisto por un servicio de Amazon 
 Defino los servicios externos dentro de la arquitectura por lo tanto ambas DB tienen que estar dentro de las Availability Zones.
 
 
-### Despliegue Manual:
+### Despliegue Local:
 
 Para realizar la compilación y el despliegue manual de esta aplicación, necesitamos tres archivos:
 1. Dockerfile (file_path: ./backend/Dockerfile).
@@ -44,3 +44,16 @@ Luego, configuramos los permisos de ejecución:
 ~~~
 sudo chmod +x /usr/local/bin/docker-compose
 ~~~
+
+#### Ejecución:
+
+Una vez que tenemos todo instalado y configurado, ejecutamos el despliegue.  
+1. Nos paramos sobre el directorio raíz y corremos el comando:
+
+~~~
+docker-compose up
+~~~
+
+2. Una vez que termina de correr el comando, vamos al navegador:
+- http://0.0.0.0:3000/ (React)
+- http://0.0.0.0:8080/ (Nginx)
