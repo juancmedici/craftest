@@ -11,10 +11,11 @@ Defino los servicios externos dentro de la arquitectura por lo tanto ambas DB ti
 
 ### Despliegue Local:
 
-Para realizar la compilación y el despliegue manual de esta aplicación, necesitamos tres archivos:
+Para realizar la compilación y el despliegue local de esta aplicación, necesitamos tres archivos:
 1. Dockerfile (file_path: ./backend/Dockerfile).
 2. Dockerfile (file_path: ./frontend/Dockerfile).
-3. docker-compose.yml (file_path: ./docker-compose.yml).
+3. Dockerfile (file_path: ./custom-nginx/Dockerfile).
+4. docker-compose.yml (file_path: ./docker-compose.yml).
 
 #### Requisitos:
 #### Instalar Docker
@@ -57,3 +58,104 @@ docker-compose up
 2. Una vez que termina de correr el comando, vamos al navegador:
 - http://0.0.0.0:3000/ (React)
 - http://0.0.0.0:8080/ (Nginx)
+
+
+### Despliegue en AWS:
+
+"Despliegue en AWS de prueba".  
+Para realizar el despliegue en AWS de esta aplicación, necesitamos dos archivos:
+1. docker-compose.yml (file_path: ./sample/docker-compose.yml).
+2. ecs-params.yml (file_path: ./sample/ecs-params.yml).
+
+#### Requisitos previos:
+
+1. Creación de un usuario IAM en la cuenta de AWS.
+2. Crear un grupo y agregar el usuario creado en el paso anterior.
+3. Crear Key Pairs para poder acceder a la instancia a través de SSH.
+4. Cambiar los permisos de nuestro my-key-pair.pem:
+
+~~~
+chmod 400 my-key-pair-region_name.pem
+~~~
+
+5. Crear una VPC o utilizar la VPC predeterminada.
+6. Crear un Security Group y configurar las reglas de entrada.
+7. Instalar AWS CLI y configurar las Acces Key.
+8. Descargar e instalar ECS CLI:
+
+~~~
+sudo curl -Lo /usr/local/bin/ecs-cli https://amazon-ecs-cli.s3.amazonaws.com/ecs-cli-linux-amd64-latest
+~~~
+
+- Verificar ECS CLI utilizando firmas PGP:
+
+~~~
+sudo apt-get install gpg
+~~~
+
+- Recuperar clave pública PGP:
+
+~~~
+gpg --keyserver hkp://keys.gnupg.net --recv BCE9D9A42D51784F
+~~~
+
+- Descargar las firmas PGP de ECS CLI:
+
+~~~
+curl -Lo ecs-cli.asc https://amazon-ecs-cli.s3.amazonaws.com/ecs-cli-linux-amd64-latest.asc
+~~~
+
+- Verificar la firma:
+
+~~~
+gpg --verify ecs-cli.asc /usr/local/bin/ecs-cli
+~~~
+
+- Configurar permisos de ejecución al binario:
+
+~~~
+sudo chmod +x /usr/local/bin/ecs-cli
+~~~
+
+8. Configurar la CLI de ECS:
+
+- Crear la configuración del cluster:
+
+~~~
+ecs-cli configure --cluster ec2-devops --default-launch-type EC2 --config-name ec2-devops --region us-east-1
+~~~
+
+- Crear un perfil utilizando una clave de acceso y una clave secreta:
+
+~~~
+ecs-cli configure profile --access-key AWS_ACCESS_KEY_ID --secret-key AWS_SECRET_ACCESS_KEY --profile-name ec2-devops-profile
+~~~
+
+#### Ejecución:
+
+- Crear un cluster:
+
+~~~
+ecs-cli up --keypair my-key-pair --capability-iam --size 2 --instance-type t2.medium --cluster-config ec2-devops --ecs-profile ec2-devops-profile
+~~~
+
+Una vez creado el cluster, podemos verificar si funciona nuestra aplicación de prueba.
+
+- Ver los contenedores en ejecución:
+
+~~~
+ecs-cli ps --cluster-config ec2-devops --ecs-profile ec2-devops-profile
+~~~
+
+
+- Finalizada la prueba, para no incurrir cargos adicionales, debemos limpiar los recursos:
+
+~~~
+ecs-cli compose service rm --cluster-config ec2-devops --ecs-profile ec2-devops-profile
+~~~
+
+- Por último, cerrar el cluster:
+
+~~~
+ecs-cli down --force --cluster-config ec2-devops --ecs-profile ec2-devops-profile
+~~~
