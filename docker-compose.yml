@@ -35,12 +35,6 @@ services:
     depends_on: 
       - sql_db
       - no_sql_db
-    logging: 
-      driver: awslogs
-      options: 
-        awslogs-group: ec2-devops
-        awslogs-region: us-east-1
-        awslogs-stream-prefix: back
   
   front:
     build:
